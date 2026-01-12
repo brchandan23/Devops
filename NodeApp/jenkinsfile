@@ -1,48 +1,47 @@
-pipeline
-{
-	agent any
-	environment
-	{
-		IMAGE_NAME="chandanbr/brnodeapp"
-	}
-	stages
-	{
-		stage("Checkout")
-		{
-			steps
-			{
-				git url="" , branch='main'
-			}
-		}
-		stage("Building Docker Image")
-		{
-			steps
-			{
-				dockerImage=docker.build("${IMAGE_NAME}:latest")
-			}
-		}
-		stage('Push to DockerHub'){
-			steps{
-				script{
-					docker.withRegistry("https://index.docker.io/v1/,'dockerID'")
-						{
-							dockerImagePush()
-						}
-				}
-			}
-		}
-	}
-	post{
-			always{
-				echo'Cleaning up Workspace...'
-				deleteDir()
-			}
-			success{
-				echo'Pipeline Succeeded'
-			}
-			failure{
-				echo"Pipelie Failed"
-				
-			}
-		}
+pipeline {
+    agent any
+
+    environment {
+        IMAGE_NAME = "chandanbr/brnodeapp"
+    }
+
+    stages {
+
+        stage("Checkout") {
+            steps {
+                git url: 'https://github.com/brchandan23/Devops.git', branch: 'main'
+            }
+        }
+
+        stage("Build Docker Image") {
+            steps {
+                script {
+                    dockerImage = docker.build("${IMAGE_NAME}:latest")
+                }
+            }
+        }
+
+        stage("Push to DockerHub") {
+            steps {
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', 'dockerID') {
+                        dockerImage.push()
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Cleaning up Workspace...'
+            deleteDir()
+        }
+        success {
+            echo 'Pipeline Succeeded'
+        }
+        failure {
+            echo 'Pipeline Failed'
+        }
+    }
 }
