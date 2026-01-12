@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chandan's Node App</title>
+</head>
+<body>
+    <h1>Backend Response:</h1>
+    <div id="message">Loading...</div>
+
+    <script>
+        // Fetch data from your Node.js server running on port 5000
+        fetch('http://localhost:5000')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('message').innerText = data;
+            })
+            .catch(error => {
+                document.getElementById('message').innerText = 'Error connecting to server';
+                console.error('Error:', error);
+            });
+    </script>
+</body>
+</html>
+
