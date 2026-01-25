@@ -1,1 +1,62 @@
 
+pipeline {
+    agent any
+
+	triggers{
+		cron('5 * * * *')
+	}
+    environment {
+        IMAGE_NAME = 'chandanbr/maven1'
+		
+    }
+
+    stages {
+
+        stage('Clone') {
+            steps {
+                git branch: 'main', url: 'https://github.com/brchandan23/Devops.git'
+            }
+        }
+	stage("mvn")
+	{
+		steps
+		{
+			sh "mvn clean package -DskipTests"
+		}
+	}
+
+
+        stage('Docker Build') {
+            steps {
+                
+                script {
+                    dockerImage = docker.build("${IMAGE_NAME}:latest1")
+                }
+                
+            }
+        }
+
+        stage('Docker Push') {
+            steps {
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhostid') {
+                        dockerImage.push('latest')
+                    }
+                }
+            }
+        }
+    }
+    post {
+		success {
+			echo "Pipeline Successful"
+		}
+		failure {
+			echo "Pipeline Failure"
+		}
+		always {
+			echo "Cleaning workspace"
+			deleteDir()
+		}
+	}
+
+}
